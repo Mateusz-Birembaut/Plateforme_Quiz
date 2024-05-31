@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Ajout question</title>
+    </head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js" integrity="sha512-bgHRAiTjGrzHzLyKOnpFvaEpGzJet3z4tZnXGjpsCcqOnAH6VGUx9frc5bcIhKTVLEiCO6vEhNAgx5jtLUYrfA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.7.0/styles/default.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css" integrity="sha384-vKruj+a13U8yHIkAyGgK1J3ArTLzrFGBbBc0tDp4ad/EyewESeXE/Iv67Aj8gKZ0" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js" integrity="sha384-PwRUT/YqbnEjkZO0zZxNqcxACrXe+j766U2amXcgMg5457rve2Y7I6ZJSm2A0mS4" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/9.0.0/mermaid.js"></script>
+  <script src="{{url_for('static', filename='scripts/questions.js')}}">nbReponses()</script>
+  <script src="{{url_for('static', filename='scripts/dynamic_page.js')}}"></script>
+  <script src="{{url_for('static', filename='scripts/server_request.js')}}"></script>
+  <link rel="stylesheet" href="{{url_for('static', filename='style/feuille.css')}}" />
+  
+  
+
+<!--
+      <body onbeforeunload="return alerte()"> 
+-->
+  <!--Permet une alerte si on quitte la page-->
+
+      <script> 
+        function alerte() {
+return "Confirmation pour quitter"
+        }
+</script>
+<form action="/saveDoc" id="form" method="get">
+          <div><input type="texte" oninput="bigRender(this.value,document.getElementById(this.id+'Visu'))"id="title" name="title" required="required" placeholder="Titre" class="titreInput"></div>
+         <div class="alignement">  
+      <div class="left">
+					<textarea oninput="bigRender(this.value,document.getElementById(this.id+'Visu'))" id="statement" name="statement" required="required" placeholder="Enonce" class="enonce" rows="5" col="90"></textarea>
+
+
+    <div class ="repsAndButtons">
+    <form action="/saveDoc" method="get">
+			<div id ="allReponses" class="allReponses">
+
+			</div>
+			<button id ="buttonRep" type="button" onclick="build1Rep('');">Ajouter une réponse</button>
+			<input type="submit" name="submit" value="Enregistrer"> 
+      <button id ="test" type="button" onclick="postTout();">TEST</button>
+      <p id="formQ"></p>
+      <p id="postEtiquette"></p>
+      <input type="hidden" name='user' value="{{session['username']}}">
+      {% if (data is defined) and data %}
+        {%for e in data['etiquettes']%}
+        <input type="hidden" name="etiquetteBefore" value="{{e}}">
+        {%endfor%}
+      {% endif %}
+    </form>
+    </div>
+
+ <!--       
+        <div class="pEtiquettes" id ="pEtiquettes">    
+            <p>Etiquettes disponibles        |       Etiquettes de l'éxercice</p>
+            <div id="SelectEtiquettes" class="SelectEtiquettes">
+            
+              <div id="allEtiquettes" class="allEtiquettes">
+              </div>
+							
+            <div id="selectedEtiquettes" class="selectedEtiquettes">
+            </div>
+					</div>
+          <div class="ajoutEtiquette">
+            <input type="text" id="nameEtiquette" placeholder="nom">
+            <button type="button" onclick="ajouterEtiquette()">Ajouter une etiquette</button>
+          </div>
+
+          </div>
+
+-->
+  </div>
+           
+          <div class="visualisation">
+            <div class="titreVisu" id="titleVisu">&#8205; </div>
+            <!--<div class="etiquettesVisu" id="etiquettesVisu"></div> affichage des étiquettes sur l'énoncé-->
+            <div class="enonceVisu" id="statementVisu">&#8205; </div>
+            <div class="reponsesVisu" id="reponsesVisu">&#8205; </div>
+          
+        </div>
+     </div>
+
+
+ <!--   
+          {%for e in etiquettes %}
+            <script>addEtiquette("{{e}}")</script>
+          {%endfor%}
+-->
+
+          {% if (data is defined) and data %}
+              <script>
+              window.addEventListener("load", (event) => {
+                console.log("page is fully loaded");
+                remplirEnonce({{data|tojson|safe}});  
+              });
+              </script>
+              
+          {% else %}
+              <script>console.log("data vide")</script>
+          {% endif %}
+
+    </body>
+</html>

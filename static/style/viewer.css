@@ -1,0 +1,98 @@
+/* https://css-tricks.com/snippets/css/a-guide-to-flexbox/ */
+@media print {
+  div {
+    break-inside: avoid;
+  }
+}
+
+
+
+p {
+  word-wrap : break-word;
+}
+
+div {
+  page-break-inside: avoid;
+}
+
+
+body {
+  background-color : #e1e1e1;
+}
+
+.allEnonces{
+  display: flex;
+  flex-direction:column;
+}
+
+.divEnonce {
+  display: flex; /* or inline-flex */
+  flex-direction:column;
+  background-color:white;
+  margin:50px;
+  border:2px solid #a1b9d3;
+  border-radius:33px;
+  padding:1%;
+}
+
+.divQuestionReponses{
+  display: flex;
+  flex-direction: row;
+  justify-content:flex-start;
+  margin:15px;
+}
+
+.divTitre {
+  background-color : #a1b9d3;
+  font-size:30px;
+}
+
+.mermaid {
+    max-width:  100%;
+}
+
+.divQuestion {
+   align-self:center;
+    width:50%;
+    padding:15px;
+}
+
+.divReponses {
+  display: flex;
+  flex-direction:column;
+  align-self:stretch;
+  width:48%;
+  padding:15px;
+  justify-content:center;
+  /* */
+  border-left:1px solid gray;
+}
+.divRep {
+  display: flex;
+  justify-content:space-between;
+}
+
+.divRepCheckbox {
+  align-self: center;
+  max-width:5%;
+}
+
+.divRepText {
+  box-sizing:content-box;
+  width:90%;
+}
+
+.divNumRep {
+  background-color:#b5c7da
+}
+
+.checkbox {
+  height: 50px;
+  width: 50px;
+  border-radius: 25%;
+  border: 3px solid #babdb6;
+  appearance : none;
+  background-color:white;
+}
+
+.checkbox {}

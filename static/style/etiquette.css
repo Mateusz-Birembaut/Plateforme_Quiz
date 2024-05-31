@@ -1,0 +1,65 @@
+.masterTitres {
+  display : flex;
+  flex-direction: column;
+}
+
+.divUser{
+  background-color:white;
+}
+
+.pUser{
+  text-align:left;
+  font-size:30px;
+  background-color : #a1b9d3;
+}
+
+.liTitre{
+  text-align:left;
+  margin-left:100px;
+  font-size:20px;
+  margin-bottom:30px;
+}
+
+.visualise{
+  padding:25px;
+  border-radius:33px;
+  font-size:30px;
+  border: 2px ridge black;
+}
+
+.checkbox {
+  height: 20px;
+  width: 20px;
+  border-radius: 5px;
+  border: 3px solid #babdb6;
+  appearance : none;
+  background-color:white;
+  vertical-align: bottom;
+}
+
+
+.checkbox:checked{
+  background-color: #2196F3;
+}
+
+.linkEnonce{
+  text-decoration:none;
+  color:#2e3436;
+  max-width:90%;
+  background-color:#bed2e8;
+  padding:10px;
+
+  border-radius:10px;
+}
+
+.linkEnonce:hover {
+
+  background-color:#3f4b57;
+  color:#ffffff;
+}
+
+.ulUser:checkbox{
+  
+}
+
+.returnHome

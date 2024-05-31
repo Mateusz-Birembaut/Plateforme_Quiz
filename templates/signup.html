@@ -1,0 +1,19 @@
+<body>
+    {% if error %}
+	         <div style="color:#FF0000"> {{ error }} </div>
+    {% endif %}
+  
+    <h1>Inscription</h1>
+    <form method="POST">
+		<input id="name" name="name" placeholder="Nom"><br>
+		<input id="surname" name="surname" required="" placeholder="Prenom"><br>
+		<input id="email" type="email" name="email" placeholder="email" required=""><br>
+		<input id="password" name="password" type="password" placeholder="Mot de passe" required=""><br>
+		
+		<input type="submit"> S'inscrire </input>
+	</form>
+
+	<a href="/login"> se connecter </a>
+
+
+</body>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/9.0.0/mermaid.js">
+  mermaid.initialize({ startOnLoad: false });
+  mermaid.mermaidAPI.initialize({ startOnLoad: false });
+</script>
+      <script src="{{url_for('static', filename='scripts/render.js')}}"></script>
+ <script
+    type="module"
+    src="https://cdn.jsdelivr.net/gh/zerodevx/zero-md@2/dist/zero-md.min.js"
+  ></script>
+      <button id="render" onclick="render2('graph','dump')">Render</button>
+    <title>Projet QCM</title>
+</head>
+<body>
+  <h1>   
+    <pre id="graph">
+            graph TD 
+            A[Client] --> B[Load Balancer] 
+            B --> C[Server1] 
+            B --> D[Server2]
+    </pre>
+    <div id="dump"></div>
+  </h1>
+
+  
+    
+</body>
+</html>
+

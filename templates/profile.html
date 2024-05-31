@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    
+    <link rel="stylesheet" href={{ url_for('static', filename='style/profile.css') }}>
+
+	<script src="{{url_for('static', filename='scripts/server_request.js')}}"></script>
+	<script src="{{url_for('static', filename='scripts/dynamic_page.js')}}"></script>
+
+	<script>
+	// ENV
+	var searchPageCallback = null;
+
+	var msg_delAllTag = "Etes vous sûr de vouloir supprimer tout les tags de la recherche ?";
+	var msg_deleteTag = "Etes vous sûr de vouloir supprimer définitivement ce tag ? le tag sera retiré de toutes les questions de votre profil";
+	var msg_deleteQuestion = "Etes vous sûr de vouloir supprimer définitivement cette question ?";
+	var msg_deleteDocument = "Etes vous sûr de vouloir supprimer définitivement ce document ?";
+	
+
+	// -------- SEARCH BAR -------
+	// MAIN
+	var searchBar = new SearchBar("searchTagPage", "documentSelected", "tagListPage");
+
+	searchBar.setOnModify(() => {
+		pageSelector.refresh();
+		updateHeightNavBar();
+	});
+
+	// TAG SELECTOR
+	var tagSearchBar = new SearchBar("selectTagPage", null, "selectTagList");
+	
+	tagSearchBar.setOnModify(() => {
+		tagSelectorPage.updatePage();
+	});
+
+	// -------- DYNAMIC PAGES --------
+
+	var pageSelector = new DynamicPageSelector(null);
+
+	// TAGS
+	var tagPage = new RequestListPage("tags_page", "tagPageList");
+
+	tagPage.setFactory((tag) => {
+		if(!tag.startsWith(searchBar.getSearchText())) {
+			return null;
+		}
+
+		let el = null;
+		if(searchBar.searchTagList.includes(tag)) {
+			el = createNode(tag, {"-": function() {
+				searchBar.removeTagSearch(tag);
+			}});
+			el.style.backgroundColor = "blue";
+		}
+		else {
+			el = createNode(tag, {"+": function() {
+				searchBar.addTagSearch(tag);
+			}});
+		}
+
+		let obj = createNode("", {"X": function() {
+			showPopUpConfirm("request_destroyTag(() => {searchBar.removeTagSearch('" + tag + "');pageSelector.reload();}, '" + tag + "')", msg_deleteTag);
+		}})
+		obj.style.display = "inline";
+
+		el.appendChild(obj);
+
+		el.className = "tagSearch";
+		return el;
+	});
+
+	tagPage.setRequest(request_getTag);
+
+
+	// TAGS SELECTOR
+	var tagSelectorPage = new RequestListPage("PUWTag", "tagSelectorList");
+
+	tagSelectorPage.setFactory((tag) => {
+		if(!tag.startsWith(tagSearchBar.getSearchText())) {
+			return null;
+		}
+
+		let el = null;
+		if(tagSearchBar.searchTagList.includes(tag)) {
+			el = createNode(tag, {"-": function() {
+				tagSearchBar.removeTagSearch(tag);
+			}});
+			el.style.backgroundColor = "blue";
+		}
+		else {
+			el = createNode(tag, {"+": function() {
+				tagSearchBar.addTagSearch(tag);
+			}});
+		}
+
+		el.className = "tagSearch";
+		return el;
+	});
+
+	tagSelectorPage.setRequest(request_getTag);
+
+
+	// QUESTIONS
+	var questionPage = new RequestListPage("questions_page", "questionsPageList");
+
+	questionPage.setFactory((question) => {
+		if(!question["title"].startsWith(searchBar.getSearchText())) {
+			return null;
+		}
+
+		for(let tag of searchBar.searchTagList) {
+			if(!question["tags"].includes(tag)) {
+				return null;
+			}
+		}
+
+		let el = document.createElement("div");
+
+		if(searchBar.searchDocumentId != null) {
+			let t_param = () => {searchBar.updateDocumentSearch(null)};
+
+			if(searchBar.searchDocumentQuestion.includes(question["id"])) {
+				el = createNode("", {"-": function() {
+					request_removeQuestionFromDocument(t_param, question["id"], searchBar.searchDocumentId);
+				}});
+				el.style.backgroundColor = "blue";
+			}
+			else {
+				el = createNode("", {"+": function() {
+					request_addQuestionToDocument(t_param, question["id"], searchBar.searchDocumentId);
+				}})
+			}
+		}
+		
+		let obj = document.createElement("button");
+		obj.appendChild(document.createTextNode("tags"));
+		obj.onclick = function() {
+			showPopUpTag(question["tags"], question["id"]);
+		};
+
+		obj.className = "searchTagButton";
+		obj.style.display = "inline";
+		el.appendChild(obj);
+
+
+		obj = createNode(question["type"] + " ---- " + question["title"] + "    ", {
+			"view": function() {window.open("/viewDoc/" + question["id"], '_blank').focus();},
+			"del": function() {showPopUpConfirm("request_destroyQuestion(() => {pageSelector.reload();}, \'" + question["id"] + "\');", msg_deleteQuestion);},
+			"✍️" : function() {window.open("/editDoc/"+question["id"],'_blank').focus();}
+		});
+		obj.style.display = "inline";
+		el.appendChild(obj);
+
+		for(let l_tag of question["tags"]) {
+			let t_eltag = document.createElement("div");
+			t_eltag.appendChild(document.createTextNode(l_tag));
+			t_eltag.className = "tagSearch";
+			el.appendChild(t_eltag);
+		}
+
+		return el;
+	});
+
+	questionPage.setRequest(request_getQuestions);
+
+
+	// DOCUMENTS
+	var docPage = new RequestListPage("documents_page", "documentsPageList");
+
+	docPage.setFactory((doc) => {
+		if(!doc["title"].startsWith(searchBar.getSearchText())) {
+			return null;
+		}
+
+		let el = document.createElement("div");
+
+		if(searchBar.searchDocumentId == doc["id"]) {
+			el = createNode("", {"-": function() {
+				searchBar.setDocumentSearch(null, null);
+			}});
+			el.style.backgroundColor = "blue";
+		}
+		else {
+			el = createNode("", {"+": function() {
+					searchBar.setDocumentSearch(null, doc["id"]);
+			}});
+		}
+		
+		let obj = createNode(doc["title"], {"del": function() {
+			showPopUpConfirm("request_destroyDocument(() => {searchBar.updateDocumentSearch(() => {pageSelector.reload();});}, " + doc['id'] + ")", msg_deleteDocument);
+		}});
+		obj.style.display = "inline";
+		el.appendChild(obj);
+
+		return el;
+	});
+
+	docPage.setRequest(request_getDocuments);
+
+	// -------- GRAPHICAL --------
+	function fadebuttonColor(elem) {
+		for(let d of document.getElementsByClassName("persistentButtonOn")) {
+			d.className = "persistentButton";
+		}
+
+		for(let d of document.getElementsByClassName("persistentButton")) {
+			if (d == elem) {
+				d.className = "persistentButtonOn";
+			}
+		}
+	}
+
+	function updateHeightNavBar() {
+		document.body.style.paddingTop = (document.getElementById("navbar").offsetHeight + document.getElementById("tagListPage").offsetHeight + 40).toString() + "px";
+	}
+
+	function unrollTagList(el, tagListPageId, callback) {
+		el.className = "searchTagButtonRotate";
+		el.setAttribute("onClick", "rollTagList(this,'" + tagListPageId + "', '" + callback + "');" + callback);
+		document.getElementById(tagListPageId).style.display = "block";
+	}
+
+	function rollTagList(el, tagListPageId, callback) {
+		el.className = "searchTagButton";
+		el.setAttribute("onClick", "unrollTagList(this, '" + tagListPageId + "', '" + callback + "');" + callback);
+		document.getElementById(tagListPageId).style.display = "none";
+	}
+
+
+	// ------- POP UP --------
+	// POP UP CONFIRM
+	function showPopUpConfirm(callbackStr, message) {
+		document.getElementById("PUWConfirm").style.display = "block";
+		document.getElementById("PUMConfirm").innerHTML = message;
+		document.getElementById("PUBConfirm").setAttribute("onClick", "hidePopUpConfirm();" + callbackStr);
+	}
+
+	function hidePopUpConfirm() {
+		document.getElementById("PUWConfirm").style.display = "none";
+		document.getElementById("tagCreator").style.display = "none";
+		document.getElementById("docCreator").style.display = "none";
+		document.getElementById("questionCreator").style.display = "none";
+	}
+
+	// SUB POP UP CONFIRM
+	function showPopUpConfirmTagCreation() {
+		document.getElementById("tagCreator").style.display = "block";
+		showPopUpConfirm("PopUpConfirmTagCreation(() => {pageSelector.reload();});", "<h3>Création d'un nouveau tag</h3>");
+	}
+
+	function showPopUpConfirmQuestionCreation() {
+		document.getElementById("questionCreator").style.display = "block";
+		showPopUpConfirm('PopUpConfirmQuestionCreation()', "<h3>Création d'une nouvelle question</h3>");
+	}
+
+	function showPopUpConfirmDocCreation() {
+		document.getElementById("docCreator").style.display = "block";
+		showPopUpConfirm("request_createDocument(() => {pageSelector.reload();}, document.getElementById('documentNameCreator').value);", "<h3>Création d'un nouveau document</h3>");
+	}
+
+	// POP UP PROFILE
+	function showPopUpProfile() {
+		document.getElementById("PUWProfile").style.display = "block";
+	}
+
+	function hidePopUpProfile() {
+		document.getElementById("PUWProfile").style.display = "none";
+		document.getElementById("pf_result").innerHTML = "";
+	}
+
+
+	// POP UP TAG SELECTOR
+
+	function showPopUpTag(alreadySelected, questionId) {
+		tagSearchBar.searchTagList = [];
+		for (let i in alreadySelected) {
+			tagSearchBar.searchTagList[i] = alreadySelected[i]; // DEEP COPY
+		}
+
+		tagSelectorPage.loadPage();
+		document.getElementById("PUCTag").setAttribute("onClick", "request_setTagsToQuestion(() => {hidePopUpTag();pageSelector.reload();}, '" + questionId + "', tagSearchBar.searchTagList);");
+		tagSearchBar.updateTagSearchList();
+
+		unrollTagList(document.getElementById("selectTagButton"), "selectTagList", "");
+	}
+
+	function hidePopUpTag() {
+		tagSelectorPage.unloadPage();
+		tagSearchBar.searchTagList = [];
+	}
+
+	// POP UP CONFIRM
+	function PopUpConfirmTagCreation(callback) {
+		request_createTag(callback, document.getElementById("tagNameCreator").value);
+	}
+
+	function PopUpConfirmQuestionCreation() {
+		let qt = "QUIZZ";
+		for(let d of document.getElementsByName("questionTypeCreator")) {
+			if(d.checked) {
+				qt = d.value;
+			}
+		}
+
+		request_createQuestion(() => {pageSelector.reload();}, document.getElementById("questionNameCreator").value, qt);
+	}
+
+	</script>
+</head>
+<body>
+
+	<!-- barre de navigation -->
+	<div id="navbar" class="navbar">
+		<div style="float:left; padding-left: 10px; padding-right: 20px;"> {{ visit_name }}  {{ visit_surname }}  </div>
+		
+		{% if isProfessor %}
+		<button class="persistentButtonOn" onclick="fadebuttonColor(this);pageSelector.changePage(docPage);">Documents</button>
+		<button class="persistentButton" onclick="fadebuttonColor(this);pageSelector.changePage(questionPage);">Questions</button>
+		<button class="persistentButton" onclick="fadebuttonColor(this);pageSelector.changePage(tagPage);">Tags</button>
+		{% endif %}
+
+		<a href="/logout"> <button class="persistentButton" style="float:right">Déconnexion</button> </a>
+		<button class="persistentButton" onclick="showPopUpProfile()" style="float:right">Mon profil</button>
+		
+		<!-- remove autocomplete on firefox -->
+		<input type="text" style="display:none">
+		<input type="password" style="display:none">
+
+		<!-- barre de recherche -->
+		{% if isProfessor %}
+		<div class="searchbar">
+			<p> Search Bar </p>
+			
+			filter by name <input autocomplete="off" id="searchTagPage" type="text">
+			Document sélectionner : 
+			<div id="documentSelected" style="display: inline;">
+				Aucun document sélectionné pour le moment
+			</div> 
+			</br>
+			TAGS : 
+			<button id="searchTagButton" onclick="unrollTagList(this, 'tagListPage', 'updateHeightNavBar();');updateHeightNavBar();" class="searchTagButton"> > </button>
+			<button onclick="showPopUpConfirm('searchBar.replaceTagSearch([]);', msg_delAllTag)" class="searchTagButton"> del </button>
+			<li id="tagListPage" class="tagListPage"></li>
+		</div>
+		{% endif %}
+	</div>
+
+	<!-- pop Up de profile -->
+	<div id="PUWProfile" class="popUpWrapper">
+		<div class="popUp">
+			<button onclick="hidePopUpProfile();">quitter la page de profil</button>
+
+			<p>nom : {{ usr_name }} </p>
+			<p>prénom : {{ usr_surname }} </p>
+			<p>email : {{ usr_email }} </p>
+
+			<p>voulez vous changer votre mot de passe ?</p>
+			<p> mot de passe actuel : <input id="pf_password" type="password"/></p>
+			<p> nouveau mot de passe : <input id="pf_newpassword" type="password"/></p>
+			<button onclick="request_changePassword(document.getElementById('pf_password').value, document.getElementById('pf_newpassword').value)"> changer de mot de passe</button>
+		</div>	
+	</div>
+
+	<!-- pop Up de selection de tag -->
+	<div id="PUWTag" class="popUpWrapper">
+		<div class="popUp">
+			<p>Veuillez sélectionner un ensemble de tag</p>
+			<p> 
+				TAGS sélectionner: 
+				<button id="selectTagButton" onclick="unrollTagList(this, 'selectTagList', '')" class="searchTagButton"> > </button> 
+				<button onclick="showPopUpConfirm('replaceTagSelect([]);', msg_delAllTag)" class="searchTagButton"> del </button>
+			</p>
+			<li id="selectTagList" class="tagListPage"></li>
+			rechercher <input id="selectTagPage" type="text" />
+
+			<li id="tagSelectorList" class="tagSelectorList"></li>
+
+			<div class="popUpSelection">
+				<div class="popUpButton">
+					<button id="PUCTag" onclick="" style="background-color: gray;">Confirm</button>
+				</div>
+				<div class="popUpButton">
+					<button onclick="hidePopUpTag();" style="background-color: rgb(163, 45, 45);">Cancel</button>
+				</div>
+			</div>
+		</div>	
+	</div>
+
+	<!-- pop Up de confirmation -->
+	<div id="PUWConfirm" class="popUpWrapper">
+		<div class="popUp">
+			<div id="PUMConfirm" class="popUpMessage">
+
+			</div>
+
+			<!-- formulaire de création de document -->
+			<div id="docCreator" style="display: none;">
+				<div>Titre du document à créer : <input id="documentNameCreator"></div>
+			</div>
+
+			<!-- formulaire de création de question -->
+			<div id="questionCreator" style="display: none;">
+				<div>Titre de la question à créer : <input id="questionNameCreator"></div>
+
+				<div>
+					Type de la question à créer :
+					<input type="radio" name="questionTypeCreator" value="QUIZZ"> QUIZZ
+					<input type="radio" name="questionTypeCreator" value="NUM"> Numérique
+				</div>
+			</div>
+
+			<!-- formulaire de création de tag -->
+			<div id="tagCreator" style="display: none;">
+				<p> Nom du tag à créer : <input id="tagNameCreator"></p>
+			</div>
+
+
+			<div class="popUpSelection">
+				<div class="popUpButton">
+					<button id="PUBConfirm" onclick="" style="background-color: gray;">Confirm</button>
+				</div>
+				<div class="popUpButton">
+					<button onclick="hidePopUpConfirm()" style="background-color: rgb(163, 45, 45);">Cancel</button>
+				</div>
+			</div>
+		</div>	
+	</div>
+
+	<!-- page dynamique des tags -->
+	<div id="tags_page" class="dynamicpage">
+		</br>
+		<h3>Tags</h3>
+		<button onclick="showPopUpConfirmTagCreation()">Créer un nouveau tag</button>
+		<li id="tagPageList"></li>
+	</div>
+
+	<!-- page dynamique des questions -->
+	<div id="questions_page" class="dynamicpage">
+		</br>
+		<h3>Questions</h3>
+		<button onclick="showPopUpConfirmQuestionCreation();">Créer une nouvelle question</button>
+		<li id="questionsPageList"></li>
+	</div>
+
+	<!-- page dynamique des documents -->
+	<div id="documents_page" class="dynamicpage">
+		</br>
+		<h3>Documents</h3>
+		<button onclick="showPopUpConfirmDocCreation()">Créer un nouveau document</button>
+		<li id="documentsPageList"></li>
+
+	</div>
+
+</br>
+	<!-- SMOOTH ALERT -->
+	<div id="smoothAlert" class="smoothAlert" style="display:none;">
+		<p id="sm_message" style="font-size: large;"></p>
+	</div>
+</body>
+
+<script> 
+	pageSelector.changePage(docPage);
+	searchBar.updateTagSearchList();
+
+	document.getElementById("searchTagPage").addEventListener("input", function (e) {
+    	pageSelector.refresh();
+	});
+
+	document.getElementById("selectTagPage").addEventListener("input", function (e) {
+    	tagSelectorPage.updatePage();
+	});
+</script>
+
+</html>

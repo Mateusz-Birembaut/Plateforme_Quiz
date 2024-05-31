@@ -1,0 +1,29 @@
+<html>
+    <head>
+       <link rel="stylesheet" href="{{url_for('static', filename='style/feuille.css')}}" />
+      <link rel="stylesheet" href="{{url_for('static', filename='style/mesenonces.css')}}" />
+        <title>Welcome</title>
+  <script src="{{url_for('static', filename='scripts/mesenonces.js')}}">
+</script>
+      <script>
+        window.onload = function() {
+        afficherTitreListe({{ enonces|safe }});
+        };</script>
+    </head>
+    <body>
+      <form action="/viewerQuestion" method="post">
+        <div class="center2">
+        <h1>Liste de vos énoncés : </h1>
+        </div>
+        <div id="masterEnonces" class="masterEnonces"></div>
+        <br><br>
+        <div class="center">
+        <input type="submit" name="submit" value="Visualiser">
+        <input type="submit" name="submit" value="Supprimer" style="align-self:stretch">
+        <a href="/AjoutQuestions" style="color: #000000; text-decoration: none;">Ajouter des questions</a>
+      <span class="bouton2" style="float:right"><a href = '/logout' style="color: #FFFFFF; text-decoration: none; ">Déconnexion   </a></span>
+        </div>
+    </form>
+
+    </body>
+</html>

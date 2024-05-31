@@ -1,0 +1,39 @@
+<html>
+    <head>
+        <title>Connexion/Inscription</title>
+      <link rel="stylesheet" href="{{url_for('static', filename='style/feuille.css')}}">
+    </head>
+    <body>
+      <div class="cadre">
+        <h1>Connexion/Inscription</h1><br><br></div>
+
+        {% with messages = get_flashed_messages() %}
+    		   {% if messages %}
+    		   	<div style="color:#00FF00">  
+    			      {% for message in messages %}
+    			         {{ message }}
+    			      {% endfor %}
+    		      	</div>
+    			 {% endif %}
+    		{% endwith %}
+      
+    		{% if error %}
+    			<div style="color:#FF0000">
+    				{{ error }}
+    			</div>
+    		{% endif %}
+
+      
+      <div class="center2">
+        <form action="/login" method="post">
+          <input type="text" name="email" required="required" placeholder="Email ou numéro étudiant" style="height:35px;width:300px;font-size:120%;"><br><br>
+          <input type="password" name="password" required="required" placeholder="Mot de passe" style="height:35px;width:300px;font-size:120%;""><br><br>
+
+          <input type="submit" name="submit" value="Connexion"></div>
+        </form>
+      </div>
+
+      <a href="/signup">vous êtes un professeur et vous n'avez pas de compte ?</a>
+
+    </body>
+</html>

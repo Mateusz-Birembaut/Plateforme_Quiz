@@ -1,0 +1,28 @@
+<html>
+    <head>
+      <link rel="stylesheet" href="{{url_for('static', filename='style/feuille.css')}}" />
+      <link rel="stylesheet" href="{{url_for('static', filename='style/etiquette.css')}}" />
+      <link rel="stylesheet" media="print" href="{{url_for('static', filename='style/feuille.css')}}">
+      <link rel="stylesheet" media="print" href="{{url_for('static', filename='style/etiquette.css')}}">
+        <title>Welcome</title>
+  <script src="{{url_for('static', filename='scripts/mesenonces.js')}}">
+</script>
+      <script>
+        window.onload = function() {
+        afficherTitrePerUser({{ titres|safe }});
+        };</script>
+    </head>
+    <body>
+      <div class="center">
+        <form action="/viewerQuestion" method="post">
+        <h1>Liste des énoncés étiquettés "{{ etiquette }}"</h1>
+        <div id="masterTitres" class="masterTitres"></div>
+        <br><br>
+        <div>
+        <input type="submit" name="submit" value="Visualiser" class="visualise">
+          <a class="returnhome" href="/">Retourner a la liste des exercices</a>
+      </div>
+      </div>
+      </form>
+    </body>
+</html>

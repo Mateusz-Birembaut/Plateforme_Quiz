@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+    <head>
+      <!DOCTYPE html>
+        <title>Welcome</title>
+      <link id="printCSS" rel="stylesheet" href="{{url_for('static', filename='style/viewerprint.css')}}">
+<script src="{{url_for('static', filename='scripts/viewer.js')}}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js" integrity="sha512-bgHRAiTjGrzHzLyKOnpFvaEpGzJet3z4tZnXGjpsCcqOnAH6VGUx9frc5bcIhKTVLEiCO6vEhNAgx5jtLUYrfA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.7.0/styles/default.min.css">
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/9.0.0/mermaid.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css" integrity="sha384-vKruj+a13U8yHIkAyGgK1J3ArTLzrFGBbBc0tDp4ad/EyewESeXE/Iv67Aj8gKZ0" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js" integrity="sha384-PwRUT/YqbnEjkZO0zZxNqcxACrXe+j766U2amXcgMg5457rve2Y7I6ZJSm2A0mS4" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"></script>
+<script>
+window.onload = function() {
+buildAllEnonces({{ enonces|safe }});
+};</script>
+    </head>
+    <body>
+    <form action="/checkReponses" method="POST">
+        <div id="allEnonces" class="allEnonces"></div>
+    <input type="submit"value="submit">
+    </form>
+          <button class="imprimer" onclick="window.print();">Imprimer</button>
+          <button class="imprimer" onclick="changePrintCSS()">Changer de style</button>
+    </body>
+</html>

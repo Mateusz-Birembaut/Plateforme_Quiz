@@ -1,0 +1,118 @@
+/* https://css-tricks.com/snippets/css/a-guide-to-flexbox/ */
+/* https://stackoverflow.com/questions/907680/css-printing-avoiding-cut-in-half-divs-between-pages */
+p {
+  word-wrap : break-word;
+}
+
+div {
+  
+}
+
+
+body {
+  background-color : white;
+}
+
+.allEnonces{
+  display: flex;
+  flex-direction:column;
+  display: table;
+  align-items:stretch;
+  width:100%;
+}
+
+.divEnonce {
+  display: flex;
+  flex-wrap:wrap;
+  background-color:white;  
+  border:2px solid #a1b9d3;
+  page-break-before: always;
+  margin-bottom:50px;  
+
+}
+
+.divQuestionReponses{
+  display: flex;
+  flex-direction: column;
+  justify-content:flex-start;
+  width:100%;
+  margin:15px;
+}
+
+.divTitre {
+  background-color : #a1b9d3;
+  font-size:30px;
+  word-wrap : break-word;
+  width:100%;
+}
+
+.mermaid {
+    max-width:  100%;
+}
+
+.divQuestion {
+   align-self:stretch;
+    width:100%;
+    padding:15px;
+}
+
+.divReponses {
+  display: flex;
+  flex-direction:column;
+  align-self:stretch;
+  width:100%;
+  padding:15px;
+  justify-content:center;
+  /* */
+
+}
+.divRep {
+  display: flex;
+  justify-content:space-evenly;
+}
+
+.divRepCheckbox {
+  align-self: center;
+  max-width:5%;
+}
+
+.divRepText {
+  box-sizing:content-box;
+  width:90%;
+}
+
+.divNumRep {
+  background-color:#b5c7da
+}
+
+.checkbox {
+  height: 30px;
+  width: 30px;
+  border-radius: 25%;
+  border: 3px solid #babdb6;
+  appearance : none;
+  background-color:white;
+}
+.checkbox:checked {
+  height: 30px;
+  width: 30px;
+  border-radius: 25%;
+  border: 3px solid #babdb6;
+  appearance : none;
+  background-color:blue;
+}
+
+@media print {
+  .imprimer {
+    visibility:hidden;
+  }
+  .divQuestion {
+    font-size:10px;
+  }
+  .divEnonce{
+    margin-left:0px;
+    margin-right:0px;
+    margin-bottom:100px;
+    border:1px solid #a1b9d3;
+  }
+}

@@ -1,0 +1,13 @@
+<html>
+    <head>
+        <title>Welcome</title>
+      <link rel="stylesheet" href="{{url_for('static', filename='style/feuille.css')}}" />
+    </head>
+    <body>
+        <h1 class="titre">Bienvenue {{ session['username'] }}</h1><br><br>
+        <div class="buttoncenter"><span class="bouton"><a href="/mesEnonces" style="color: #FFFFFF; text-decoration: none;"> Consulter/Modifier des énoncés</a></span>
+        <div class="bouton2"><a href="/AjoutQuestions" style="color: #FFFFFF; text-decoration: none;">Ajouter des questions</a></div>
+    </div>
+        <div class="botright"><span class="bouton2"><a href = '/logout' style="color: #FFFFFF; text-decoration: none;">Déconnexion   </a></span></div>
+    </body>
+</html>
